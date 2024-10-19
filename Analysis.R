@@ -90,6 +90,67 @@ t.test(BeforeInitiative$AvgT, AfterInitiative$AvgT,
        var.equal = FALSE)
 
 
+
+
+
+
+#Pre-monsoon
+PreMonsoon <- Rabies[which(Rabies$Season=='Pre-monsoon'),]
+PreMonsoon$Season
+
+#Descriptive PreMonsoon
+describe(PreMonsoon$RabiesCase)
+describe(PreMonsoon$ARV)
+describe(PreMonsoon$MDV)
+describe(PreMonsoon$Rainfall)
+describe(PreMonsoon$AvgT)
+
+
+#Subset Monsoon
+Monsoon <- Rabies[which(Rabies$Season=='Rainy'),]
+Monsoon$Season
+
+#Descriptive (2006-2013)
+describe(Monsoon$RabiesCase)
+describe(Monsoon$ARV)
+describe(Monsoon$MDV)
+describe(Monsoon$Rainfall)
+describe(Monsoon$AvgT)
+
+
+
+
+#Subset Monsoon
+Winter <- Rabies[which(Rabies$Season=='Winter'),]
+Winter$Season
+
+#Descriptive Winter
+describe(Winter$RabiesCase)
+describe(Winter$ARV)
+describe(Winter$MDV)
+describe(Winter$Rainfall)
+describe(Winter$AvgT)
+
+
+
+
+NROW(BeforeInitiative$RabiesCase)
+NROW(AfterInitiative$RabiesCase)
+
+summary(aov(Rabies$RabiesCase ~ Rabies$Season))
+
+summary(aov(Rabies$ARV ~ Rabies$Season))
+
+summary(aov(Rabies$MDV ~ Rabies$Season))
+
+summary(aov(Rabies$Rainfall ~ Rabies$Season))
+
+summary(aov(Rabies$AvgT ~ Rabies$Season))
+
+
+
+
+
 library(ggpubr)
 library(ggplot2)
 library(extrafont)
@@ -104,114 +165,95 @@ ggpairs(data.frame(RabiesCorr))
 
 #Yearly Data
 YearwiseRabies <- aggregate(Rabies$RabiesCase, by=list(Category=Rabies$Year), FUN=sum)
+YearwiseRabies$Category
+YearwiseRabies$x
 YearwiseARV <- aggregate(Rabies$ARV, by=list(Category=Rabies$Year), FUN=sum)
+YearwiseARV$x
 YearwiseMDV <- aggregate(Rabies$MDV, by=list(Category=Rabies$Year), FUN=sum)
+YearwiseMDV$x
+
+library(tidyverse)
+
+df1<-data.frame(TYPE = c(rep("ARV", 19), rep("MDV", 19)),
+                      Years = rep(c("2006", "2007", "2008", "2009", "2010", "2011", "2012", 
+                                   "2013", "2014", "2015", "2016", "2017", "2018", "2019", 
+                                   "2020", "2021", "2022", "2023", "2024"),2),
+                      value = c(NA, NA, NA, NA, NA, 29994, 129444, 167160, 197551, 226459, 251617,
+                                240414, 240376, 246710, 194950, 238369, 275412, 258356, NA,
+                                NA,     NA,     NA,     NA,     NA,     NA,  45655,  16089,  26318, 135269,  
+                                70303,  40420, 365316, 625208, 212562, 288837, 341486, 266010,     NA))
+
+df2<-data.frame(TYPE = c(rep("Rabies Cases", 19)),
+                Years = c("2006", "2007", "2008", "2009", "2010", "2011", "2012", 
+                             "2013", "2014", "2015", "2016", "2017", "2018", "2019", 
+                             "2020", "2021", "2022", "2023", "2024"),
+                value = c(167, 166, 165, 164, 104, 109,  82,  82, 106,  83,  66,  80,  60,  57,  26,  
+                          38,  47,  47,  28))
 
 
-
-data <- data.frame('ARV_MDV' = c(rep(c("ARV", "MDV"),19)),
-                   'Year' = c("2006", "2007","2008", "2009","2010", "2011",
-                              "2012", "2013","2014", "2015","2016", "2017",
-                              "2018", "2019","2020", "2021",,"2022", "2023","2024"),
-                   '' = c(34.1, 65.9,
-                              32.0, 68.0,
-                              0.0, 0.0,
-                              36.6, 63.4,
-                              39.2, 60.8),
-                   'n' = c(723, 1395,
-                           587, 1247,
-                           0, 0,
-                           545, 943,
-                           439, 681)) %>%
-  
-  mutate(Ano_do_Nascimento = as.numeric(as.character(Ano_do_Nascimento)),
-         perc = ifelse(Tipo_de_Parto == 'Vaginal', perc, NA)) # drop unwanted percentages here
-
-
-# this is the factor we will use to scale the secondary y-axis
-your_factor <- max(data$n) / 100
+options(scipen = 999) ## To disable scientific notation
+barplotYear <- ggplot() + 
+  geom_col(data = df1, aes(x = Years, y = value, fill = TYPE), position = position_dodge()) +
+  scale_fill_manual("", values = c("ARV" = "#FFD580", "MDV" = "skyblue"))+
+  geom_point(data = df2, aes(x = Years, y = value*1000,  group = TYPE, col = TYPE)) + 
+  geom_line(data = df2, aes(x = Years, y = value*1000, group = TYPE, col = TYPE)) +
+  scale_color_manual("", values = c("Rabies Cases" = "#FF7F7F"))+
+  scale_y_continuous(name = "Number of Vaccines",
+                     sec.axis = sec_axis(trans = ~.*1/1000, name="Rabies Cases"))+
+  theme_bw()+
+  theme(legend.title = element_text(size=15),
+        legend.text = element_text(size=15),
+        legend.position = c(0.2, 0.8),
+        plot.title = element_text(hjust = 0.5),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5),
+        text=element_text(size=15),
+        axis.text.y = element_text(hjust = 0.5),
+        axis.title.x = element_text(hjust = 0.5,size=15))+
+  labs(caption = "★ = up to September' 2024")
 
 
-# plot bars
-p <- ggplot(data, aes(x = Ano_do_Nascimento, y = n, fill = Tipo_de_Parto)) +
-  geom_bar(stat = 'identity', position = 'dodge') +
-  scale_fill_manual(values = c('Cesário' = 'blue4', 'Vaginal' = 'blue')) +
-  
-  # add percentages
-  geom_point(aes(x = Ano_do_Nascimento, y = perc*your_factor),
-             color = 'orange') +
-  geom_line(aes(x = Ano_do_Nascimento, y = perc*your_factor),
-            color = 'orange') +
-  
-  # add secondary y-axis
-  scale_y_continuous("n", 
-                     sec.axis = sec_axis(~./your_factor, name = "perc")) 
+#Monthly Data
+MonthwiseRabies <- aggregate(Rabies$RabiesCase, by=list(Category=Rabies$Month), FUN=sum)
+MonthwiseRabies$Category
+MonthwiseRabies$x
+Rabies$ARVNoMiss <- replace(Rabies$ARV, is.na(Rabies$ARV),0)
+MonthwiseARV <- aggregate(Rabies$ARVNoMiss, by=list(Category=Rabies$Month), FUN=sum)
+MonthwiseARV$x
+Rabies$MDVNoMiss <- replace(Rabies$MDV, is.na(Rabies$MDV),0)
+MonthwiseMDV <- aggregate(Rabies$MDVNoMiss, by=list(Category=Rabies$Month), FUN=sum)
+MonthwiseMDV$x
 
-# calculate the range of the secondary y-axis
-y2_range <- ggplot_build(p)$layout$panel_params[[1]]$y.range / your_factor
+library(tidyverse)
 
-# add the points to the plotly object
-ggplotly(p) %>%
-  
-  # add the secondary axis back in
-  add_trace(x=~Ano_do_Nascimento, y=~perc, yaxis="y2",
-            data=data, showlegend=FALSE, inherit=FALSE, mode = "markers") %>%
-  layout(yaxis2 = list(overlaying = "y", side = "right", title = "perc", range = y2_range))
+df1<-data.frame(TYPE = c(rep("ARV", 12), rep("MDV", 12)),
+                Months = rep(c(seq(1,12)),2),
+                value = c(237055, 217692, 236523, 207038, 208852, 204955, 185731, 201060, 218737, 
+                          251210, 268275, 259684,
+                          178219, 363121, 302754, 295280, 309726, 299713,  96499,  
+                          65006,  63543, 181541, 253079, 28277))
+
+df2<-data.frame(TYPE = c(rep("Rabies Cases", 12)),
+                Months = c(seq(1,12)),
+                value = c(182, 165, 113, 145,  98, 115,  98, 127, 137, 153, 155, 189))
 
 
-
-describe.by(Rabies$RC, Rabies$Year)
-
-
-YearwiseRC <- aggregate(Rabies$RC, by=list(Category=Dengue$Year), FUN=sum)
-YearwiseRC
-describe(YearwiseRC)
-summary(YearwiseRC$x)
-
-YearwiseAvgT <- aggregate(Dengue$AvgT, by=list(Category=Dengue$Year), FUN=mean)
-YearwiseAvgT
-YearwiseRainfall <- aggregate(Dengue$Rainfall, by=list(Category=Dengue$Year), FUN=sum)
-YearwiseRainfall
-
-colnames(YearwiseRC) <- c("Year","RC")
-YearwiseRC
-
-df2 <- data.frame(Dengue=c("Cases"),
-                  Years=c(YearwiseRC$Year),
-                  Numbers=c(YearwiseRC$RC))
-
-# Change the colors manually
-p <- ggplot(data=df2, aes(x=Years, y=Numbers, fill=Dengue)) + 
-  geom_bar(position="dodge", stat="identity")+
-  theme_minimal()+  theme_bw() +
-  theme( legend.title=element_blank(),
-         legend.text = element_text(color = "Black", size = 25), legend.position = c(0.8, 0.9),
-         text = element_text(size = 25))
-
-# Use custom colors
-p + scale_fill_manual(values=c('#999999','#E69F00'))
-# Use brewer color palettes
-p<- p + scale_fill_brewer(palette="Dark2") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-p
-
-
-monthwiseRC <- aggregate(Dengue$RC, by=list(Category=Dengue$Month), FUN=mean)
-monthwiseRC
-
-df2 <- data.frame(Dengue=c("Cases"),
-                  Months=c(monthwiseRC$Category),
-                  Numbers=c(monthwiseRC$x))
-
-
-# Change the colors manually
-q <- ggplot(data=df2, aes(x=Months, y=Numbers, fill=Dengue)) +
-  geom_bar(position="dodge", stat="identity")+
-  
-  theme_minimal() + theme_bw() +
-  theme( legend.title=element_blank(),
-         legend.text = element_text(color = "Black", size = 25), legend.position = c(0.15, 0.94),
-         text = element_text(size = 25)) +
-
+options(scipen = 999) ## To disable scientific notation
+barplotMonth <- ggplot() + 
+  geom_col(data = df1, aes(x = Months, y = value, fill = TYPE), position = position_dodge()) +
+  scale_fill_manual("", values = c("ARV" = "#FFD580", "MDV" = "skyblue"))+
+  geom_point(data = df2, aes(x = Months, y = value*1000,  group = TYPE, col = TYPE)) + 
+  geom_line(data = df2, aes(x = Months, y = value*1000, group = TYPE, col = TYPE)) +
+  scale_color_manual("", values = c("Rabies Cases" = "#FF7F7F"))+
+  scale_y_continuous(name = "Number of Vaccines",
+                     sec.axis = sec_axis(trans = ~.*1/1000, name="Rabies Cases"))+
+  theme_bw()+
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5),
+        text=element_text(size=15),
+        axis.text.y = element_text(hjust = 0.5),
+        axis.title.x = element_text(hjust = 0.5,size=15))+
+  labs(caption = "★ = up to September' 2024")+
   scale_x_discrete(limits = c("1", "2", "3", 
                               "4", "5", "6", 
                               "7", "8", "9", 
@@ -221,237 +263,31 @@ q <- ggplot(data=df2, aes(x=Months, y=Numbers, fill=Dengue)) +
                               "Jun", "Jul",
                               "Aug", "Sep", 
                               "Oct", "Nov", "Dec"))
-# Use custom colors
-q + scale_fill_manual(values=c('#999999','#E69F00'))
-# Use brewer color palettes
-q <- q + scale_fill_brewer(palette="Dark2")+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-q
 
-tiff("DCDDM.tiff", units="in", width=12, height=13, res=300)
 
-library(cowplot)
-
-gridExtra::grid.arrange(plot_grid(p, q, labels = "AUTO", ncol = 1, nrow = 2))
+tiff("barplotYearMonth.tiff", units="in", width=10, height=12, res=300)
+gridExtra::grid.arrange(barplotYear, barplotMonth, nrow=2, ncol=1)
 dev.off()
 
+mean(Rabies$GrowthFactor_CbP)
+sd(Rabies$GrowthFactor_CbP)
 
-fYearwiseRC <- YearwiseRC[which(YearwiseRC$Year<='2013'), ]
+describe.by(Rabies$GrowthFactor_CbP, Rabies$Season)
 
-mean(fYearwiseRC$RC, na.rm = T)
-sd(fYearwiseRC$RC, na.rm = T)
-summary(fYearwiseRC$RC, na.rm = T)
-
-sYearwiseRC <- YearwiseRC[which(YearwiseRC$Year>'2013'), ]
-
-mean(sYearwiseRC$RC, na.rm = T)
-sd(sYearwiseRC$RC, na.rm = T)
-summary(sYearwiseRC$RC, na.rm = T)
-
-fYearwiseAvgT <- YearwiseAvgT[which(YearwiseAvgT$Category<='2013'), ]
-
-mean(fYearwiseAvgT$x, na.rm = T)
-sd(fYearwiseAvgT$x, na.rm = T)
-
-sYearwiseAvgT <- YearwiseAvgT[which(YearwiseAvgT$Category>'2013'), ]
-
-mean(sYearwiseAvgT$x, na.rm = T)
-sd(sYearwiseAvgT$x, na.rm = T)
-
-fYearwiseRainfall <- YearwiseRainfall[which(YearwiseRainfall$Category<='2013'), ]
-
-mean(fYearwiseRainfall$x, na.rm = T)
-sd(fYearwiseRainfall$x, na.rm = T)
-
-sYearwiseRainfall <- YearwiseRainfall[which(YearwiseRainfall$Category>'2013'), ]
-
-mean(sYearwiseRainfall$x, na.rm = T)
-sd(sYearwiseRainfall$x, na.rm = T)
-
-
-fmonthwise <- Dengue[which(Dengue$Year<='2013'),]
-NROW(fmonthwise)
-
-x <- ggplot(fmonthwise, aes(x=as.factor(Month), y=Rainfall)) + 
-  geom_boxplot(fill="slateblue", alpha=0.5) + 
-  ylab("Monthly rainfall (mm)") + xlab("") + ggtitle("Monthly rainfall Dhaka, Bangladesh (2000-2010)") +
-  scale_x_discrete(limits = c("1", "2", "3", 
-                              "4", "5", "6", 
-                              "7", "8", "9", 
-                              "10", "11", "12"),
-                   labels = c("Jan", "Feb", 
-                              "Mar", "Apr", "May", 
-                              "Jun", "Jul",
-                              "Aug", "Sep", 
-                              "Oct", "Nov", "Dec"))+theme(axis.text=element_text(size=12,face="bold"),
-                                                         axis.title=element_text(size=14,face="bold"))+
-  theme(plot.title = element_text(size = 16, face = "bold",hjust = 0.5)
-  )
-x
-
-fmonthwise <- Dengue[which(Dengue$Year>'2013'), ]
-
-y <- ggplot(fmonthwise, aes(x=as.factor(Month), y=Rainfall)) + 
-  geom_boxplot(fill="slateblue", alpha=0.5) + 
-  ylab("Monthly rainfall (mm)") + xlab("") + ggtitle("Monthly rainfall Dhaka, Bangladesh (2011-2022)") +
-  scale_x_discrete(limits = c("1", "2", "3", 
-                              "4", "5", "6", 
-                              "7", "8", "9", 
-                              "10", "11", "12"),
-                   labels = c("Jan", "Feb", 
-                              "Mar", "Apr", "May", 
-                              "Jun", "Jul",
-                              "Aug", "Sep", 
-                              "Oct", "Nov", "Dec"))+theme(axis.text=element_text(size=12,face="bold"),
-                                                          axis.title=element_text(size=14,face="bold"))+
-  theme(plot.title = element_text(size = 16, face = "bold",hjust = 0.5)
-  )
-y
-
-tiff("box.tiff", units="in", width=12, height=12, res=300)
-gridExtra::grid.arrange(x,y)
-dev.off()
-
-
-mean(fmonthwise$RC, na.rm = T)
-sd(fmonthwise$RC, na.rm = T)
-
-mean(fmonthwise$AvgT, na.rm = T)
-sd(fmonthwise$AvgT, na.rm = T)
-
-mean(fmonthwise$Rainfall, na.rm = T)
-sd(fmonthwise$Rainfall, na.rm = T)
-
-smonthwise <- Dengue[which(Dengue$Year>'2013'), ]
-NROW(smonthwise$RC)
-
-mean(smonthwise$RC, na.rm = T)
-sd(smonthwise$RC, na.rm = T)
-
-mean(smonthwise$AvgT, na.rm = T)
-sd(smonthwise$AvgT, na.rm = T)
-
-mean(smonthwise$Rainfall, na.rm = T)
-sd(smonthwise$Rainfall, na.rm = T)
-
-t.test(fYearwiseDC$DC[1:132], sYearwiseDC$DC[1:132], paired = TRUE, alternative = "two.sided")
-t.test(fYearwiseDD$DD[1:132], sYearwiseDD$DD[1:132], paired = TRUE, alternative = "two.sided")
-t.test(fYearwiseAvgT$x[1:132], sYearwiseAvgT$x[1:132], paired = TRUE, alternative = "two.sided")
-t.test(fYearwiseRainfall$x[1:132], sYearwiseRainfall$x[1:132], paired = TRUE, alternative = "two.sided")
-
-# monthwiseRainfall <- Dengue[which(Dengue$Year<='2013'),]
-# fmonthwiseRainfallsm <- monthwiseRainfall[monthwiseRainfall$Month<7 |monthwiseRainfall$Month>10,]
-# smonthwiseRainfallsm <- monthwiseRainfall[monthwiseRainfall$Month>=7 |monthwiseRainfall$Month<=10,]
-# 
-# mean(fmonthwiseRainfallsm$Rainfall)
-# sd(fmonthwiseRainfallsm$Rainfall)
-# 
-# mean(smonthwiseRainfallsm$Rainfall)
-# sd(smonthwiseRainfallsm$Rainfall)
-# 
-# monthwiseRainfalll <- Dengue[which(Dengue$Year>'2010'), ]
-# fmonthwiseRainfallsml <- monthwiseRainfalll[monthwiseRainfalll$Month<7 |monthwiseRainfalll$Month>10,]
-# smonthwiseRainfallsml <- monthwiseRainfalll[monthwiseRainfalll$Month>=7 |monthwiseRainfalll$Month<=10,]
-# 
-# mean(fmonthwiseRainfallsml$Rainfall)
-# sd(fmonthwiseRainfallsml$Rainfall)
-# 
-# mean(smonthwiseRainfallsml$Rainfall)
-# sd(smonthwiseRainfallsml$Rainfall)
-# 
-# 
-# t.test(fmonthwiseRainfallsm$Rainfall, fmonthwiseRainfallsml$Rainfall[1:88], paired = TRUE, alternative = "two.sided")
-# t.test(smonthwiseRainfallsm$Rainfall, smonthwiseRainfallsml$Rainfall[1:132], paired = TRUE, alternative = "two.sided")
-# 
-# t.test(fmonthwiseRainfallsm$Rainfall, smonthwiseRainfallsm$Rainfall[1:88], paired = TRUE, alternative = "two.sided")
-# t.test(fmonthwiseRainfallsml$Rainfall, smonthwiseRainfallsml$Rainfall[1:96], paired = TRUE, alternative = "two.sided")
-# NROW(smonthwiseRainfallsml$Rainfall)
-
-monthwise <- aggregate(Dengue$RC, by=list(Category=Dengue$Month), FUN=mean)
-monthwise
-
-monthwise <- aggregate(Dengue$RC, by=list(Category=Dengue$Month), FUN=min)
-monthwise
-
-monthwise <- aggregate(Dengue$RC, by=list(Category=Dengue$Month), FUN=sd)
-monthwise
-
-monthwise <- aggregate(Dengue$RC, by=list(Category=Dengue$Month), FUN=max)
-monthwise
-
-#Monthly
-theme_set(theme_classic())
-
-NROW(Dengue$RC)
-
-DengueTS <- ts(Dengue$RC, frequency=12, start=c(2006,1), end=c(2024,9))
-
-# Plot
-a <- ggseasonplot(DengueTS)+ geom_line(size=1) + 
-  theme_bw()  + xlab("Months") + ylab("Number of Rabies cases") + ggtitle("") +  
-  theme( legend.title=element_blank(),
-         legend.text = element_text(color = "Black", size = 25), legend.position = c(0.2, 0.8),
-         text = element_text(size = 25)) 
-
-a
-
-tiff("DC.tiff", units="in", width=18, height=12, res=300)
-gridExtra::grid.arrange(a)
-dev.off()
-
-
-#t <- (Dengue$DC +1)/(lag(Dengue$DC)+1)
-t <- Dengue$Gfexp
-options(scipen=999)
-DengueGF <- ts(t[2:225], frequency=12, start=c(2006,2), end=c(2024,9))
-# Plot
-b <- ggseasonplot(DengueGF) + geom_line(size=1) + scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
-                                              labels = trans_format("log10", math_format(10^.x))) + 
-  theme_bw()  + xlab("Months") + ylab("Monthly growth factor") + ggtitle("") +   geom_hline(yintercept=1, linetype="dashed", 
-                                                                                           color = "black", size=1)+
-  theme( legend.title=element_blank(),
-         legend.text = element_text(color = "Black", size = 18), legend.position = c(0.1, 0.75),
-         text = element_text(size = 18) ) 
-
-b
-
-#GF
-#Dengue$Values_GF <- log((Dengue$DC +1)/(lag(Dengue$DC)+1))
-
-#DengueTSlog <- ts(Dengue$Values_GF, frequency=12, start=c(2000,1), end=c(2022,12))
-
-DengueTSlog <- ts(Dengue$Gfexp, frequency=12, start=c(2006,1), end=c(2024,9))
-
-# Dengue_mean <- aggregate(Dengue$Values_GF, by=list(Category=Dengue$Month), FUN=mean, na.rm=T)
-# Dengue_mean
-# mean(Dengue_mean$x)
-# sd(Dengue_mean$x)
-# 
-# Dengue_sd <- aggregate(Dengue$Values_GF, by=list(Category=Dengue$Month), FUN=SD, na.rm=T)
-# Dengue_sd
-# mean(Dengue_sd$x)
-#  
-# margin <- qt(0.975,df=11-1)*Dengue_sd$x / sqrt(11)
-# 
-# Dengue_sd$lower.ci <- Dengue_mean$x - margin
-# Dengue_sd$lower.ci
-# mean(Dengue_sd$lower.ci)
-# Dengue_sd$upper.ci = Dengue_mean$x + margin
-# Dengue_sd$upper.ci
-# mean(Dengue_sd$upper.ci)
 library(Rmisc)
-CIs <- group.CI(Dengue$Gfexp ~ Dengue$Month, data=Dengue, ci = 0.95)
+CIs <- group.CI(Rabies$Gfexp ~ Rabies$Month, data=Rabies, ci = 0.95)
 CIs
-mean(CIs$`Dengue$Gfexp.mean`)
-sd(CIs$`Dengue$Gfexp.mean`)
+mean(CIs$`Rabies$Gfexp.mean`)
+sd(CIs$`Rabies$Gfexp.mean`)
 my.data <- data.frame(time     = c(1, 2,3, 4,5, 6,
                                    7, 8,9, 10,11, 12,
                                    1, 2,3, 4,5, 6,
                                    7, 8,9, 10,11, 12,
                                    1, 2,3, 4,5, 6,
                                    7, 8,9, 10,11, 12),
-                      means    = c(CIs$`Dengue$Gfexp.mean`),
-                      lowerCI  = c(CIs$`Dengue$Gfexp.lower`),
-                      upperCI  = c(CIs$`Dengue$Gfexp.upper`),
+                      means    = c(CIs$`Rabies$Gfexp.mean`),
+                      lowerCI  = c(CIs$`Rabies$Gfexp.lower`),
+                      upperCI  = c(CIs$`Rabies$Gfexp.upper`),
                       scenario = rep(c("Mean monthly growth factor"), each=3))
 
 
@@ -466,6 +302,7 @@ c <- ggplot(my.data, aes(x = factor(time), y = means, group = scenario))+
                       breaks = c( 'Mean monthly growth factor', '95% Confidence interval'))+  ylab("Monthly growth factor") + 
   xlab("Months") + ggtitle("") +  theme_bw()+ geom_hline(yintercept=1, linetype="dashed", 
                                                          color = "black", size=1)+
+  theme_bw()+
   theme( legend.title=element_blank(),
          legend.text = element_text(color = "Black", size = 18),
          legend.position = c(0.2, 0.9),
@@ -483,34 +320,188 @@ c <- ggplot(my.data, aes(x = factor(time), y = means, group = scenario))+
 c
 
 
+
+colnames(YearwiseRabies) <- c("Year", "Rabies Cases")
+YearwiseRabies$Gf <- YearwiseRabies$`Rabies Cases`/lag(YearwiseRabies$`Rabies Cases`)
+YearwiseRabies$Gflog <- log(YearwiseRabies$Gf)
+YearwiseRabies$Gfexp <- exp(YearwiseRabies$Gflog)
+
+library(Rmisc)
+CIs <- group.CI(Rabies$Gfexp ~ Rabies$Year, data=Rabies, ci = 0.95)
+CIs
+mean(CIs$`Rabies$Gfexp.mean`)
+sd(CIs$`Rabies$Gfexp.mean`)
+my.data <- data.frame(time     = rep(c("2006", "2007", "2008", "2009", "2010", "2011", "2012", 
+                                   "2013", "2014", "2015", "2016", "2017", "2018", "2019", 
+                                   "2020", "2021", "2022", "2023", "2024"),3),
+                      means    = c(CIs$`Rabies$Gfexp.mean`),
+                      lowerCI  = c(CIs$`Rabies$Gfexp.lower`),
+                      upperCI  = c(CIs$`Rabies$Gfexp.upper`),
+                      scenario = rep(c("Mean yearly growth factor"), each=3))
+
+
+d <- ggplot(my.data, aes(x = factor(time), y = means, group = scenario))+
+  geom_line(aes(colour = scenario), size =1)+
+  geom_line(aes(y = lowerCI, colour = paste(scenario, '95% Confidence interval')),
+            linetype = 'dashed')+
+  geom_line(aes(y = upperCI, colour = paste(scenario, '95% Confidence interval')),
+            linetype = 'dashed')+
+  scale_colour_manual(values = c('Mean yearly growth factor' = 'black',
+                                 '95% Confidence interval' = 'black'),
+                      breaks = c( 'Mean yearly growth factor', '95% Confidence interval'))+  ylab("Yearly growth factor") + 
+  xlab("Years") + ggtitle("") +  theme_bw()+ geom_hline(yintercept=1, linetype="dashed", 
+                                                         color = "black", size=1)+
+  theme_bw()+
+  theme( legend.title=element_blank(),
+         legend.text = element_text(color = "Black", size = 18),
+         legend.position = c(0.2, 0.9),
+         text = element_text(size = 18),
+         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5))
+
+d
+
+
 tiff("GF.tiff", units="in", width=12, height=16, res=300)
-gridExtra::grid.arrange(c,b)
+gridExtra::grid.arrange(c,d)
 dev.off()
 
 
 
 
-#ARIMA
+# Data
+InterRabies <- aggregate(Rabies$RabiesCase, by=list(Category=Rabies$InterventionNum), FUN=sum)
+InterRabies$Category
+InterRabies$x
+Rabies$ARVNoMiss <- replace(Rabies$ARV, is.na(Rabies$ARV),0)
+InterARV <- aggregate(Rabies$ARVNoMiss, by=list(Category=Rabies$InterventionNum), FUN=sum)
+InterARV$x
+Rabies$MDVNoMiss <- replace(Rabies$MDV, is.na(Rabies$MDV),0)
+InterMDV <- aggregate(Rabies$MDVNoMiss, by=list(Category=Rabies$InterventionNum), FUN=sum)
+InterMDV$x
 
-YearWiseCase <- aggregate(Dengue$RC, by=list(Category=Dengue$Year), FUN=sum)
-YearWiseCase
+library(tidyverse)
 
-DengueTS <- ts(YearWiseCase$x, start=c(2000))
+df1<-data.frame(TYPE = c(rep("ARV", 2), rep("MDV", 2)),
+                Initiative = rep(c(seq(1,2)),2),
+                value = c(326598, 2370214,
+                          65029, 2371729))
 
-auto.arima(DengueTS)
+df2<-data.frame(TYPE = c(rep("Rabies Cases", 2)),
+                Initiative = c(seq(1,2)),
+                value = c(1039,  638))
 
-Fit<-Arima(DengueTS,order=c(0,1,0),lambda=0 )
-summary(Fit)
 
-fcast <- forecast(Fit, h=10)
-library(ggfortify)
-z <- autoplot(fcast, size = 2) +
-  xlab("Years") + ylab("Number of dengue cases") +ggtitle("ARIMA Model")+
-  guides(colour=guide_legend(title="Observed data"),
-  fill=guide_legend(title="Prediction interval"))+ theme(legend.position="bottom") + theme_bw()+
-  theme( legend.text = element_text(color = "Black", size = 40),
-         text = element_text(size = 40))
-z
+options(scipen = 999) ## To disable scientific notation
+barplotInter <- ggplot() + 
+  geom_col(data = df1, aes(x = Initiative , y = value, fill = TYPE), position = position_dodge()) +
+  scale_fill_manual("", values = c("ARV" = "#FFD580", "MDV" = "skyblue"))+
+  geom_point(data = df2, aes(x = Initiative, y = value*1000,  group = TYPE, col = TYPE)) + 
+  geom_line(data = df2, aes(x = Initiative, y = value*1000, group = TYPE, col = TYPE)) +
+  scale_color_manual("", values = c("Rabies Cases" = "#FF7F7F"))+
+  scale_y_continuous(name = "Number of Vaccines",
+                     sec.axis = sec_axis(trans = ~.*1/1000, name="Rabies Cases"))+
+  theme_bw()+
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5),
+        text=element_text(size=15),
+        axis.text.y = element_text(hjust = 0.5),
+        axis.title.x = element_text(hjust = 0.5,size=15))+
+  labs(caption = "★ = up to September' 2024")+
+  scale_x_discrete(limits = c("1", "2"),
+                   labels = c("Before", "After"))
+
+
+
+
+
+
+
+#Seasonal Data
+SeasonalRabies <- aggregate(Rabies$RabiesCase, by=list(Category=Rabies$SeasonNum), FUN=sum)
+SeasonalRabies$Category
+SeasonalRabies$x
+Rabies$ARVNoMiss <- replace(Rabies$ARV, is.na(Rabies$ARV),0)
+SeasonalARV <- aggregate(Rabies$ARVNoMiss, by=list(Category=Rabies$SeasonNum), FUN=sum)
+SeasonalARV$x
+Rabies$MDVNoMiss <- replace(Rabies$MDV, is.na(Rabies$MDV),0)
+SeasonalMDV <- aggregate(Rabies$MDVNoMiss, by=list(Category=Rabies$SeasonNum), FUN=sum)
+SeasonalMDV$x
+
+library(tidyverse)
+
+df1<-data.frame(TYPE = c(rep("ARV", 3), rep("MDV", 3)),
+                Seasons = rep(c(seq(1,3)),2),
+                value = c(652413, 1061693,  982706,
+                          907760, 706302, 822696))
+
+df2<-data.frame(TYPE = c(rep("Rabies Cases", 3)),
+                Seasons = c(seq(1,3)),
+                value = c(356, 630, 691))
+
+
+options(scipen = 999) ## To disable scientific notation
+barplotSeasons <- ggplot() + 
+  geom_col(data = df1, aes(x = Seasons, y = value, fill = TYPE), position = position_dodge()) +
+  scale_fill_manual("", values = c("ARV" = "#FFD580", "MDV" = "skyblue"))+
+  geom_point(data = df2, aes(x = Seasons, y = value*1000,  group = TYPE, col = TYPE)) + 
+  geom_line(data = df2, aes(x = Seasons, y = value*1000, group = TYPE, col = TYPE)) +
+  scale_color_manual("", values = c("Rabies Cases" = "#FF7F7F"))+
+  scale_y_continuous(name = "Number of Vaccines",
+                     sec.axis = sec_axis(trans = ~.*1/1000, name="Rabies Cases"))+
+  theme_bw()+
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5),
+        text=element_text(size=15),
+        axis.text.y = element_text(hjust = 0.5),
+        axis.title.x = element_text(hjust = 0.5,size=15))+
+  labs(caption = "★ = up to September' 2024")+
+  scale_x_discrete(limits = c("1", "2", "3"),
+                   labels = c("Pre-monsoon", "Rainy", "Winter"))
+
+
+tiff("barplotSeasons.tiff", units="in", width=8, height=12, res=300)
+gridExtra::grid.arrange(barplotSeasons, barplotInter)
+dev.off()
+
+
+
+
+
+
+
+
+#Menn kendal
+library(Kendall)
+library(trend)
+
+#Rabies Cases
+myts <- ts(YearwiseRabies$x)
+
+library(trend)
+MannKendall(myts)
+sens.slope(myts, conf.level = 0.95)
+
+
+#ARV
+myts <- ts(YearwiseARV$x)
+
+library(trend)
+MannKendall(myts)
+mytsnomiss <- replace(myts, is.na(myts),0)
+sens.slope(mytsnomiss, conf.level = 0.95)
+
+
+#MDV
+myts <- ts(YearwiseMDV$x)
+
+library(trend)
+MannKendall(myts)
+mytsnomiss <- replace(myts, is.na(myts),0)
+sens.slope(mytsnomiss, conf.level = 0.95)
+
+
 
 
 
@@ -521,52 +512,59 @@ z
 rm(list=ls())
 library(MASS)
 library(tscount)
-dendat <- read.csv("Rabies_Weather_Data.csv", header=T)  
-dim(dendat)
-head(dendat)
-names(dendat)
-#dendat <- dendat[c(37:276),] # discarding the set of missing values #
+library(glmmTMB)
+library(DHARMa)
+library(performance)
+library(scales)
+BeforeInitiative$Season
+options(scipen = 999)
 
-fitglm <- glm(RC ~ AvgT + Rainfall + ARV + dendat$MDV, data=dendat, family=poisson(link = "log"))
+setwd('E:\\ResearchProject\\Sumon Bhai\\Rabies Weather')
+Rabies <- read.csv("Rabies_Weather_Data.csv")
+
+fitglm <- glm(RabiesCase ~ ARV + MDV + Rainfall + AvgT + Season, data=Rabies, 
+              family=poisson(link = "log"))
+
+
+library(car)
 summary(fitglm)
-#stepAIC(fitglm)
-cat("IRR for AvgT. = ", exp(fitglm$coefficients[2]))
-cat("IRR for Lag1Rainfall = ", exp(fitglm$coefficients[3]*100))
-cat("IRR for Lag2Rainfall = ", exp(fitglm$coefficients[4]*100))
+round(exp(fitglm$coefficients),6)
+round(exp(confint(fitglm)),6)
 
-confint(fitglm)
-exp(confint(fitglm)[2,1:2])
-exp(confint(fitglm)[3,1:2]*100)
-exp(confint(fitglm)[4,1:2]*100)
+options(scipen = 999)
+performance::performance(fit)
 
 
-## Analysis using tscount package ##
-attach(dendat)  
-xcov = cbind(AvgT, Rainfall, Lag1AvgT, Lag2AvgT, Lag1Rainfall, Lag2Rainfall, AvgT*Rainfall)
-fittsglm <- tsglm(DC, xreg=xcov, link = "log", distr = "poisson")
-summary(fittsglm)
-
-summary(fittsglm)[5]$coefficient[,1]/summary(fittsglm)[5]$coefficient[,2]
-
-exp(summary(fittsglm)[5]$coefficient[,1])
 
 
-summary(fit_pois)
-coeftest(fit_pois)
 
-exp(fit_pois$coefficients)
 
-round(exp(confint(fit_pois)),3)
+fitglm <- glm(RabiesCase ~ ARV + MDV + Rainfall + AvgT + Season, data=BeforeInitiative, 
+              family=poisson(link = "log"))
 
-#Menn kendal
-library(Kendall)
-library(trend)
 
-myts <- ts(YearWiseCase$x)
-t.test(YearWiseCase$x)$"conf.int"
-mean(YearWiseCase$x)
+library(car)
+summary(fitglm)
+round(exp(fitglm$coefficients),6)
+round(exp(confint(fitglm)),6)
 
-library(trend)
-MannKendall(myts)
-sens.slope(myts, conf.level = 0.95)
-sea.sens.slope(myts)
+options(scipen = 999)
+performance::performance(fit)
+
+
+
+
+fitglm <- glm(RabiesCase ~ ARV + MDV + Rainfall + AvgT + Season, data=AfterInitiative, 
+              family=poisson(link = "log"))
+
+
+library(car)
+summary(fitglm)
+round(exp(fitglm$coefficients),6)
+round(exp(confint(fitglm)),6)
+
+options(scipen = 999)
+performance::performance(fit)
+
+
+
