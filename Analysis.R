@@ -36,7 +36,7 @@ library(visreg)
 setwd('E:\\ResearchProject\\Sumon Bhai\\Rabies Weather')
 Rabies <- read.csv("Rabies_Weather_Data.csv")
 
-#Rabies Case
+#Yearwise Rabies Case
 YearwiseRabies <- aggregate(Rabies$RabiesCase, by=list(Category=Rabies$Year), FUN=sum)
 YearwiseRabies$Category
 YearwiseRabies$x
@@ -44,52 +44,52 @@ YearwiseRabies$x
 colnames(YearwiseRabies) <- c("Year", "RabiesCase")
 describe(YearwiseRabies$RabiesCase)
 
-BeforeInitiative <- YearwiseRabies[which(YearwiseRabies$Year<='2013'),]
-describe(BeforeInitiative$RabiesCase)
+BeforeInitiativeRabies <- YearwiseRabies[which(YearwiseRabies$Year<='2013'),]
+describe(BeforeInitiativeRabies$RabiesCase)
 
-AfterInitiative <- YearwiseRabies[which(YearwiseRabies$Year>'2013'),]
-describe(AfterInitiative$RabiesCase)
+AfterInitiativeRabies <- YearwiseRabies[which(YearwiseRabies$Year>'2013'),]
+describe(AfterInitiativeRabies$RabiesCase)
 
-t.test(BeforeInitiative$RabiesCase, AfterInitiative$RabiesCase,  
+t.test(BeforeInitiativeRabies$RabiesCase, AfterInitiativeRabies$RabiesCase,  
        alternative = "two.sided", 
        var.equal = FALSE)
 
 
 #ARV
-YearwiseARV <- aggregate(Rabies$ARV, by=list(Category=Rabies$Year), FUN=sum)
+YearwiseARV <- aggregate(Rabies$ARV[61:216], by=list(Category=Rabies$Year[61:216]), FUN=sum)
 YearwiseARV$Category
 YearwiseARV$x
 
 colnames(YearwiseARV) <- c("Year", "ARV")
 describe(YearwiseARV$ARV)
 
-BeforeInitiative <- YearwiseARV[which(YearwiseARV$Year<='2013'),]
-describe(BeforeInitiative$ARV)
+BeforeInitiativeARV <- YearwiseARV[which(YearwiseARV$Year<='2013'),]
+describe(BeforeInitiativeARV$ARV)
 
-AfterInitiative <- YearwiseARV[which(YearwiseARV$Year>'2013'),]
-describe(AfterInitiative$ARV)
+AfterInitiativeARV <- YearwiseARV[which(YearwiseARV$Year>'2013'),]
+describe(AfterInitiativeARV$ARV)
 
-t.test(BeforeInitiative$ARV, AfterInitiative$ARV,  
+t.test(BeforeInitiativeARV$ARV, AfterInitiativeARV$ARV,  
        alternative = "two.sided", 
        var.equal = FALSE)
 
 
 
 #MDV
-YearwiseMDV <- aggregate(Rabies$MDV, by=list(Category=Rabies$Year), FUN=sum)
+YearwiseMDV <- aggregate(Rabies$MDV[61:216], by=list(Category=Rabies$Year[61:216]), FUN=sum)
 YearwiseMDV$Category
 YearwiseMDV$x
 
 colnames(YearwiseMDV) <- c("Year", "MDV")
 describe(YearwiseMDV$MDV)
 
-BeforeInitiative <- YearwiseMDV[which(YearwiseMDV$Year<='2013'),]
-describe(BeforeInitiative$MDV)
+BeforeInitiativeMDV <- YearwiseMDV[which(YearwiseMDV$Year<='2013'),]
+describe(BeforeInitiativeMDV$MDV)
 
-AfterInitiative <- YearwiseMDV[which(YearwiseMDV$Year>'2013'),]
-describe(AfterInitiative$MDV)
+AfterInitiativeMDV <- YearwiseMDV[which(YearwiseMDV$Year>'2013'),]
+describe(AfterInitiativeMDV$MDV)
 
-t.test(BeforeInitiative$MDV, AfterInitiative$MDV,  
+t.test(BeforeInitiativeMDV$MDV, AfterInitiativeMDV$MDV,  
        alternative = "two.sided", 
        var.equal = FALSE)
 
@@ -137,55 +137,138 @@ t.test(BeforeInitiative$AvgT, AfterInitiative$AvgT,
 
 
 
-#Pre-monsoon
+#Monthly Data Rabies
+MonthwiseRabies <- aggregate(Rabies$RabiesCase, by=list(Category=Rabies$Month), FUN=mean)
+MonthwiseRabies$Category
+MonthwiseRabies$x
+colnames(MonthwiseRabies) <- c("Months", "RabiesCase")
+describe(MonthwiseRabies$RabiesCase)
+
+#Subset Pre-monsoon
+PreMonsoonRabies <- Rabies[which(Rabies$Season =='Pre-monsoon'),]
+PreMonsoonRabies$Season
+#Descriptive PreMonsoon
+describe(PreMonsoonRabies$RabiesCase)
+
+#Subset Monsoon
+MonsoonRabies <- Rabies[which(Rabies$Season=='Monsoon'),]
+MonsoonRabies$Season
+#Descriptive (2006-2013)
+describe(MonsoonRabies$RabiesCase)
+
+#Subset Winter
+WinterRabies <- Rabies[which(Rabies$Season=='Winter'),]
+WinterRabies$Season
+#Descriptive Winter
+describe(WinterRabies$RabiesCase)
+
+
+
+#Monthly Data ARV
+MonthwiseARV <- aggregate(Rabies$ARV[61:216], by=list(Category=Rabies$Month[61:216]), FUN=mean)
+MonthwiseARV$Category
+MonthwiseARV$x
+colnames(MonthwiseARV) <- c("Months", "ARV")
+describe(MonthwiseARV$ARV)
+
+#Subset Pre-monsoon
+PreMonsoonARV <- Rabies[which(Rabies$Season[61:216]=='Pre-monsoon'),]
+PreMonsoonARV$Season
+#Descriptive PreMonsoon
+describe(PreMonsoonARV$ARV)
+
+#Subset Monsoon
+MonsoonARV <- Rabies[which(Rabies$Season[61:216]=='Monsoon'),]
+MonsoonARV$Season
+#Descriptive (2006-2013)
+describe(MonsoonARV$ARV)
+
+#Subset Winter
+WinterARV <- Rabies[which(Rabies$Season=='Winter'),]
+WinterARV$Season
+#Descriptive Winter
+describe(WinterARV$ARV)
+
+#Monthly Data MDV
+MonthwiseMDV <- aggregate(Rabies$MDV[61:216], by=list(Category=Rabies$Month[61:216]), FUN=mean)
+MonthwiseMDV$Category
+MonthwiseMDV$x
+colnames(MonthwiseMDV) <- c("Months", "MDV")
+describe(MonthwiseMDV$MDV)
+
+#Subset Pre-monsoon
+PreMonsoonMDV <- Rabies[which(Rabies$Season[61:216]=='Pre-monsoon'),]
+PreMonsoonMDV$Season
+#Descriptive PreMonsoon
+describe(PreMonsoonMDV$MDV)
+
+#Subset Monsoon
+MonsoonMDV <- Rabies[which(Rabies$Season[61:216]=='Monsoon'),]
+MonsoonMDV$Season
+#Descriptive (2006-2013)
+describe(MonsoonMDV$MDV)
+
+#Subset Winter
+WinterMDV <- Rabies[which(Rabies$Season[61:216]=='Winter'),]
+WinterMDV$Season
+#Descriptive Winter
+describe(WinterMDV$MDV)
+
+
+#Monthly Data Rainfall
+MonthwiseRainfall <- aggregate(Rabies$Rainfall, by=list(Category=Rabies$Month), FUN=mean)
+MonthwiseRainfall$Category
+MonthwiseRainfall$x
+colnames(MonthwiseRainfall) <- c("Months", "Rainfall")
+describe(MonthwiseRainfall$Rainfall)
+
+#Subset Pre-monsoon
 PreMonsoon <- Rabies[which(Rabies$Season=='Pre-monsoon'),]
 PreMonsoon$Season
-
 #Descriptive PreMonsoon
-describe(PreMonsoon$RabiesCase)
-describe(PreMonsoon$ARV)
-describe(PreMonsoon$MDV)
 describe(PreMonsoon$Rainfall)
-describe(PreMonsoon$AvgT)
-
 
 #Subset Monsoon
-Monsoon <- Rabies[which(Rabies$Season=='Rainy'),]
-Monsoon$Season
-
+MonsoonRainfall <- Rabies[which(Rabies$Season=='Monsoon'),]
+MonsoonRainfall$Season
 #Descriptive (2006-2013)
-describe(Monsoon$RabiesCase)
-describe(Monsoon$ARV)
-describe(Monsoon$MDV)
-describe(Monsoon$Rainfall)
-describe(Monsoon$AvgT)
+describe(MonsoonRainfall$Rainfall)
 
+#Subset Winter
+WinterRainfall <- Rabies[which(Rabies$Season=='Winter'),]
+WinterRainfall$Season
+#Descriptive Winter
+describe(WinterRainfall$Rainfall)
 
+#Monthly Data Temperature
+MonthwiseAvgT <- aggregate(Rabies$AvgT, by=list(Category=Rabies$Month), FUN=mean)
+MonthwiseAvgT$Category
+MonthwiseAvgT$x
+colnames(MonthwiseAvgT) <- c("Months", "AvgT")
+describe(MonthwiseAvgT$AvgT)
 
+#Subset Pre-monsoon
+PreMonsoonAvgT <- Rabies[which(Rabies$Season=='Pre-monsoon'),]
+PreMonsoonAvgT$Season
+#Descriptive PreMonsoon
+describe(PreMonsoonAvgT$AvgT)
 
 #Subset Monsoon
-Winter <- Rabies[which(Rabies$Season=='Winter'),]
-Winter$Season
+MonsoonAvgT <- Rabies[which(Rabies$Season=='Monsoon'),]
+MonsoonAvgT$Season
+#Descriptive (2006-2013)
+describe(MonsoonAvgT$AvgT)
 
+#Subset Winter
+WinterAvgT <- Rabies[which(Rabies$Season=='Winter'),]
+WinterAvgT$Season
 #Descriptive Winter
-describe(Winter$RabiesCase)
-describe(Winter$ARV)
-describe(Winter$MDV)
-describe(Winter$Rainfall)
-describe(Winter$AvgT)
-
-
-NROW(BeforeInitiative$RabiesCase)
-NROW(AfterInitiative$RabiesCase)
+describe(WinterAvgT$AvgT)
 
 summary(aov(Rabies$RabiesCase ~ Rabies$Season))
-
-summary(aov(Rabies$ARV ~ Rabies$Season))
-
-summary(aov(Rabies$MDV ~ Rabies$Season))
-
+summary(aov(Rabies$ARV[61:216] ~ Rabies$Season[61:216]))
+summary(aov(Rabies$MDV[61:216] ~ Rabies$Season[61:216]))
 summary(aov(Rabies$Rainfall ~ Rabies$Season))
-
 summary(aov(Rabies$AvgT ~ Rabies$Season))
 
 
@@ -231,11 +314,17 @@ library(extrafont)
 library(GGally)
 library(MASS)
 
-RabiesCorr <- cbind(Rabies$Rainfall, Rabies$AvgT, Rabies$ARV, Rabies$MDV, Rabies$RabiesCase)
+RabiesCorr <- cbind(Rabies$Rainfall[61:216], Rabies$AvgT[61:216], Rabies$ARV[61:216], Rabies$MDV[61:216], Rabies$RabiesCase[61:216])
 
 colnames(RabiesCorr) <- c("Rainfall", "Tempurature", "ARV", "MDV", "Rabies Cases")
 
 ggpairs(data.frame(RabiesCorr))
+
+library(GGally)
+CorrPlot <- ggpairs(data.frame(RabiesCorr),  
+                    lower = list(continuous = "smooth"))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+CorrPlot
 
 y <- lm(Rabies$RabiesCase ~ Rabies$Rainfall)
 summary(y)
@@ -264,26 +353,14 @@ y <- lm(Rabies$AvgT ~ Rabies$Rainfall)
 summary(y)
 
 
-library(GGally)
-CorrPlot <- ggpairs(data.frame(RabiesCorr),  
-                    lower = list(continuous = "smooth"))
-CorrPlot
 
-#Yearly Data
-YearwiseRabies <- aggregate(Rabies$RabiesCase, by=list(Category=Rabies$Year), FUN=sum)
-YearwiseRabies$Category
-YearwiseRabies$x
-YearwiseARV <- aggregate(Rabies$ARV, by=list(Category=Rabies$Year), FUN=sum)
-YearwiseARV$x
-YearwiseMDV <- aggregate(Rabies$MDV, by=list(Category=Rabies$Year), FUN=sum)
-YearwiseMDV$x
+
+
+#Yearly Rabies Barplot
 
 library(tidyverse)
-df2<-data.frame(Years = c("2006", "2007", "2008", "2009", "2010", "2011", "2012", 
-                             "2013", "2014", "2015", "2016", "2017", "2018", "2019", 
-                             "2020", "2021", "2022", "2023", "2024"),
-                value = c(167, 166, 165, 164, 104, 109,  82,  82, 106,  83,  66,  80,  60,  57,  26,  
-                          38,  47,  47,  28))
+df2<-data.frame(Years = YearwiseRabies$Year,
+                value = c(YearwiseRabies$RabiesCase))
 
 
 options(scipen = 999) ## To disable scientific notation
@@ -300,27 +377,12 @@ YRC <- ggplot(df2, aes(x = Years, y = value))+ geom_col(fill = "#0073C2FF")+
 
 YRC
 
-#Monthly Data
-MonthwiseRabies <- aggregate(Rabies$RabiesCase, by=list(Category=Rabies$Month), FUN=mean)
-MonthwiseRabies$Category
-MonthwiseRabies$x
-
-colnames(MonthwiseRabies) <- c("Months", "RabiesCase")
-
-Rabies$ARVNoMiss <- replace(Rabies$ARV, is.na(Rabies$ARV),0)
-MonthwiseARV <- aggregate(Rabies$ARVNoMiss, by=list(Category=Rabies$Month), FUN=mean)
-MonthwiseARV$x
-colnames(MonthwiseARV) <- c("Months", "ARV")
-
-Rabies$MDVNoMiss <- replace(Rabies$MDV, is.na(Rabies$MDV),0)
-MonthwiseMDV <- aggregate(Rabies$MDVNoMiss, by=list(Category=Rabies$Month), FUN=mean)
-MonthwiseMDV$x
-colnames(MonthwiseMDV) <- c("Months", "MDV")
+#Monthly Rabies Barplot
 
 library(tidyverse)
 
-df2<-data.frame(Months = c(seq(1,12)),
-                value = c(9.58, 8.68, 5.95, 7.63,  5.16, 6.05, 5.16, 6.68, 7.21, 8.50, 8.61, 10.50))
+df2<-data.frame(Months = MonthwiseRabies$Months,
+                value = MonthwiseRabies$RabiesCase)
 
 
 options(scipen = 999) ## To disable scientific notation
@@ -348,9 +410,15 @@ tiff("barplotYearMonth.tiff", units="in", width=10, height=12, res=300)
 gridExtra::grid.arrange(YRC, MRC, nrow=2, ncol=1)
 dev.off()
 
+
+
+
+
+#Yearly MDV ARV Barplot
+
 df2 <- data.frame(Vaccines=rep(c("ARV", "MDV"), each=13),
-                  Years=rep(c(YearwiseARV$Year[6:18]),2),
-                  Numbers=c(YearwiseARV$ARV[6:18],YearwiseMDV$MDV[6:18]))
+                  Years=rep(c(YearwiseARV$Year),2),
+                  Numbers=c(YearwiseARV$ARV,YearwiseMDV$MDV))
 
 # Change the colors manually
 p <- ggplot(data=df2, aes(x=factor(Years), y=Numbers/100000, fill=Vaccines)) +
@@ -416,18 +484,18 @@ dev.off()
 
 
 
-# Data
+#Barplot by initiative and season
 
 library(tidyverse)
-
+mean(BeforeInitiativeARV$ARV)
 df1<-data.frame(TYPE = c(rep("ARV", 2), rep("MDV", 2)),
                 Initiative = rep(c(seq(1,2)),2),
-                value = c(108866, 237021.4,
-                          30872, 237172.9))
+                value = c(mean(BeforeInitiativeARV$ARV), mean(AfterInitiativeARV$ARV),
+                          mean(BeforeInitiativeMDV$MDV), mean(AfterInitiativeMDV$MDV)))
 
 df2<-data.frame(TYPE = c(rep("Rabies Cases", 2)),
                 Initiative = c(seq(1,2)),
-                value = c(129.88,  58.00))
+                value = c(mean(BeforeInitiativeRabies$RabiesCase), mean(AfterInitiativeRabies$RabiesCase)))
 
 
 options(scipen = 999) ## To disable scientific notation
@@ -454,78 +522,17 @@ barplotInter
 
 
 
-
-#Seasonal Data
-RabiesPremonsson <- Rabies[Rabies$Season == "Pre-monsoon",]
-
-
-SeasonalRabies <- aggregate(RabiesPremonsson$RabiesCase, by=list(Category=RabiesPremonsson$Year), FUN=sum)
-
-colnames(SeasonalRabies) <- c("Year", "RabiesCase")
-describe(SeasonalRabies$RabiesCase)
-
-SeasonalRabies <- aggregate(RabiesPremonsson$ARV, by=list(Category=RabiesPremonsson$Year), FUN=sum)
-
-colnames(SeasonalRabies) <- c("Year", "ARV")
-describe(SeasonalRabies$ARV)
-
-SeasonalRabies <- aggregate(RabiesPremonsson$MDV, by=list(Category=RabiesPremonsson$Year), FUN=sum)
-
-colnames(SeasonalRabies) <- c("Year", "MDV")
-describe(SeasonalRabies$MDV)
-
-
-#Seasonal Data
-RabiesMonsson <- Rabies[Rabies$Season == "Monsoon",]
-
-
-SeasonalRabies <- aggregate(RabiesMonsson$RabiesCase, by=list(Category=RabiesMonsson$Year), FUN=sum)
-
-colnames(SeasonalRabies) <- c("Year", "RabiesCase")
-describe(SeasonalRabies$RabiesCase)
-
-SeasonalRabies <- aggregate(RabiesMonsson$ARV, by=list(Category=RabiesMonsson$Year), FUN=sum)
-
-colnames(SeasonalRabies) <- c("Year", "ARV")
-describe(SeasonalRabies$ARV)
-
-SeasonalRabies <- aggregate(RabiesMonsson$MDV, by=list(Category=RabiesMonsson$Year), FUN=sum)
-
-colnames(SeasonalRabies) <- c("Year", "MDV")
-describe(SeasonalRabies$MDV)
-
-
-#Seasonal Data
-RabiesWinter <- Rabies[Rabies$Season == "Winter",]
-
-
-SeasonalRabies <- aggregate(RabiesWinter$RabiesCase, by=list(Category=RabiesWinter$Year), FUN=sum)
-
-colnames(SeasonalRabies) <- c("Year", "RabiesCase")
-describe(SeasonalRabies$RabiesCase)
-
-SeasonalRabies <- aggregate(RabiesWinter$ARV, by=list(Category=RabiesWinter$Year), FUN=sum)
-
-colnames(SeasonalRabies) <- c("Year", "ARV")
-describe(SeasonalRabies$ARV)
-
-SeasonalRabies <- aggregate(RabiesWinter$MDV, by=list(Category=RabiesWinter$Year), FUN=sum)
-
-colnames(SeasonalRabies) <- c("Year", "MDV")
-describe(SeasonalRabies$MDV)
-
-
-
+mean(PreMonsoonARV$ARV)
 library(tidyverse)
 
 df1<-data.frame(TYPE = c(rep("ARV", 3), rep("MDV", 3)),
                 Seasons = rep(c(seq(1,3)),2),
-                value = c(50185.62, 81668.69,  75592.77,
-                          75646.67, 58858.50, 68284.25))
+                value = c(mean(PreMonsoonARV$ARV), mean(MonsoonARV$ARV),  mean(WinterARV$ARV[1:72]),
+                          mean(PreMonsoonMDV$MDV), mean(MonsoonMDV$MDV),  mean(WinterMDV$MDV)))
 
 df2<-data.frame(TYPE = c(rep("Rabies Cases", 3)),
                 Seasons = c(seq(1,3)),
-                value = c(18.74, 33.16, 36.37))
+                value = c(mean(PreMonsoonRabies$RabiesCase), mean(MonsoonRabies$RabiesCase),  mean(WinterRabies$RabiesCase)))
 
 
 options(scipen = 999) ## To disable scientific notation
@@ -552,19 +559,12 @@ tiff("barplotSeasons.tiff", units="in", width=8, height=12, res=300)
 gridExtra::grid.arrange(barplotSeasons, barplotInter)
 dev.off()
 
-
-
-
-
-
-
-
 #Menn kendal
 library(Kendall)
 library(trend)
 
 #Rabies Cases
-myts <- ts(YearwiseRabies$x)
+myts <- ts(YearwiseRabies$RabiesCase)
 
 library(trend)
 MannKendall(myts)
@@ -572,7 +572,7 @@ sens.slope(myts, conf.level = 0.95)
 
 
 #ARV
-myts <- ts(YearwiseARV$x)
+myts <- ts(YearwiseARV$ARV)
 
 library(trend)
 MannKendall(myts)
@@ -581,16 +581,12 @@ sens.slope(mytsnomiss, conf.level = 0.95)
 
 
 #MDV
-myts <- ts(YearwiseMDV$x)
+myts <- ts(YearwiseMDV$MDV)
 
 library(trend)
 MannKendall(myts)
 mytsnomiss <- replace(myts, is.na(myts),0)
 sens.slope(mytsnomiss, conf.level = 0.95)
-
-
-
-
 
 
 #######Count GLM
@@ -619,5 +615,5 @@ round(exp(fitglm$coefficients),6)
 round(exp(confint(fitglm)),6)
 
 options(scipen = 999)
-performance::performance(fit)
+performance::performance(fitglm)
 
