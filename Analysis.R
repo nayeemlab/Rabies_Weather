@@ -490,12 +490,12 @@ library(tidyverse)
 mean(BeforeInitiativeARV$ARV)
 df1<-data.frame(TYPE = c(rep("ARV", 2), rep("MDV", 2)),
                 Initiative = rep(c(seq(1,2)),2),
-                value = c(mean(BeforeInitiativeARV$ARV), mean(AfterInitiativeARV$ARV),
-                          mean(BeforeInitiativeMDV$MDV), mean(AfterInitiativeMDV$MDV)))
+                value = c(3402.0625, 19751.78333,
+                          677.3854167, 19764.40833))
 
 df2<-data.frame(TYPE = c(rep("Rabies Cases", 2)),
                 Initiative = c(seq(1,2)),
-                value = c(mean(BeforeInitiativeRabies$RabiesCase), mean(AfterInitiativeRabies$RabiesCase)))
+                value = c(10.82291667, 4.945736434))
 
 
 options(scipen = 999) ## To disable scientific notation
@@ -507,13 +507,15 @@ barplotInter <- ggplot() +
   scale_color_manual("", values = c("Annual Mean Rabies Cases" = "#FF7F7F"))+
   scale_y_continuous(name = "Annual Mean Vaccines",
                      sec.axis = sec_axis(trans = ~.*1/1000, name="Annual Mean Rabies Cases"))+
+  xlab("Intervention Phase")+
   theme_bw()+
-  theme(legend.position = "none",
-        plot.title = element_text(hjust = 0.5),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5),
+  theme(
+    plot.title = element_text(hjust = 0.5),
+        axis.text.x = element_text(angle = 0, vjust = 0.5, hjust=0.5, face = "bold"),
         text=element_text(size=15),
         axis.text.y = element_text(hjust = 0.5),
-        axis.title.x = element_text(hjust = 0.5,size=15))+
+        axis.title.x = element_text(hjust = 0.5,size=15),
+    legend.position = "none")+
   scale_x_discrete(limits = c("1", "2"),
                    labels = c("Before", "After"))
 
@@ -527,12 +529,12 @@ library(tidyverse)
 
 df1<-data.frame(TYPE = c(rep("ARV", 3), rep("MDV", 3)),
                 Seasons = rep(c(seq(1,3)),2),
-                value = c(mean(PreMonsoonARV$ARV), mean(MonsoonARV$ARV),  mean(WinterARV$ARV[1:72]),
-                          mean(PreMonsoonMDV$MDV), mean(MonsoonMDV$MDV),  mean(WinterMDV$MDV)))
+                value = c(12081.72222, 11796.58889,  13648.69444,
+                          16810.37037, 7847.8,  11426.33333))
 
 df2<-data.frame(TYPE = c(rep("Rabies Cases", 3)),
                 Seasons = c(seq(1,3)),
-                value = c(mean(PreMonsoonRabies$RabiesCase), mean(MonsoonRabies$RabiesCase),  mean(WinterRabies$RabiesCase)))
+                value = c(6.245614035, 6.70212766,  9.337837838))
 
 
 options(scipen = 999) ## To disable scientific notation
@@ -545,17 +547,18 @@ barplotSeasons <- ggplot() +
   scale_y_continuous(name = "Annual Mean Vaccines",
                      sec.axis = sec_axis(trans = ~.*1/1000, name="Annual Mean Rabies Cases"))+
   theme_bw()+
-  theme(legend.position = "none",
+  theme(
         plot.title = element_text(hjust = 0.5),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5),
+        axis.text.x = element_text(angle = 0, vjust = 0.5, hjust=0.5, face = "bold"),
         text=element_text(size=15),
         axis.text.y = element_text(hjust = 0.5),
-        axis.title.x = element_text(hjust = 0.5,size=15))+
+        axis.title.x = element_text(hjust = 0.5,size=15),
+        legend.position = c(0.9, 0.87))+
   scale_x_discrete(limits = c("1", "2", "3"),
                    labels = c("Pre-monsoon", "Rainy", "Winter"))
 barplotSeasons
 
-tiff("barplotSeasons.tiff", units="in", width=8, height=12, res=300)
+tiff("barplotSeasons.tiff", units="in", width=8, height=10, res=300)
 gridExtra::grid.arrange(barplotSeasons, barplotInter)
 dev.off()
 
@@ -599,13 +602,44 @@ library(glmmTMB)
 library(DHARMa)
 library(performance)
 library(scales)
-Rabies$Season
 options(scipen = 999)
 
 setwd('E:\\ResearchProject\\Sumon Bhai\\Rabies Weather')
 Rabies <- read.csv("Rabies_Weather_Data.csv")
 
-fitglm <- glm(RabiesCase ~ MDV + Rainfall + AvgT + relevel(factor(Rabies$Season), ref = "Pre-monsoon"), data=Rabies, 
+
+fitglm <- glm(RabiesCase ~ MDV + Rainfall + AvgT + Season, data=BeforeInitiative, 
+              family=poisson(link = "log"))
+
+
+library(car)
+summary(fitglm)
+round(exp(fitglm$coefficients),6)
+round(exp(confint(fitglm)),6)
+
+options(scipen = 999)
+performance::performance(fitglm)
+
+
+
+
+fitglm <- glm(RabiesCase ~ MDV + Rainfall + AvgT + Season, data=AfterInitiative, 
+              family=poisson(link = "log"))
+
+
+library(car)
+summary(fitglm)
+round(exp(fitglm$coefficients),6)
+round(exp(confint(fitglm)),6)
+
+options(scipen = 999)
+performance::performance(fitglm)
+
+
+
+
+
+fitglm <- glm(RabiesCase ~ MDV + Rainfall + AvgT + Season, data=Rabies, 
               family=poisson(link = "log"))
 
 
